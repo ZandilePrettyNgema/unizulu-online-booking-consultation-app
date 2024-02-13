@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login Page</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="css/style.css" />
+
+    <script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-app.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-auth.js"></script>
+
+    <script src="form.js"></script>
+  </head>
+
+  <body>
+    <div class="hero">
+      <div class="form-box">
+        <h3 class="h3-header">
+          Unizulu Online Booking Consultation
+        </h3>
+
+        <div class="button-box">
+          <div id="btn"></div>
+          <button type="button" class="toggle-btn" onclick="login()">
+            Log In
+          </button>
+          <button type="button" class="toggle-btn" onclick="register()">
+            Sign Up
+          </button>
+        </div>
+
+        <div class="formContainer">
+          <div id="login" class="input-group">
+            <input
+              type="text"
+              class="input-field"
+              id="Email"
+              placeholder="Email:"
+              required
+            />
+            <input
+              type="password"
+              class="input-field"
+              id="Password"
+              placeholder="Password:"
+              required
+            />
+            <br />
+            <br />
+            <input type="submit" class="btn" id="loginBtn" value="Login" />
+            <br />
+          </div>
+        </div>
+
+        <form style="margin-bottom: 100px">
+          <div class="formContainer">
+            <div class="input-group" id="register">
+              <input
+                type="text"
+                class="input-field"
+                id="name"
+                placeholder="Name:"
+                required
+              />
+              <input
+                type="email"
+                id="email"
+                class="input-field"
+                placeholder="Email:"
+                required
+              />
+              <input
+                type="text"
+                id="module"
+                class="input-field"
+                placeholder="Modules: e.g, SCPS111, SPHY121 and SMTH111"
+                required
+              />
+              <input
+                type="text"
+                id="office"
+                class="input-field"
+                placeholder="Office No:"
+                required
+              />
+              <label for="role">Role:</label>
+              <select id="role" name="role">
+                <option value="student">Student</option>
+                <option value="tutor">Tutor</option>
+                <option value="lecturer">Lecturer</option>
+                <option value="counsellor">Counsellor</option></select
+              ><br />
+              <input
+                type="password"
+                id="password"
+                class="input-field"
+                placeholder="Password:"
+                required
+              />
+              <input type="submit" value="Register" class="btn" id="submit" />
+              <br />
+            </div>
+          </div>
+        </form>
+      </div>
+      <div id="message" style="color: white; font-size: 16pt"></div>
+    </div>
+
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
+      import {
+        getDatabase,
+        ref,
+        set,
+        get,
+        child,
+      } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
+
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyCzcyCxSy5p26W99GKg2HyGVDkhD4ZElwc",
+
+        authDomain: "final-project-ae3c2.firebaseapp.com",
+
+        databaseURL: "https://final-project-ae3c2-default-rtdb.firebaseio.com",
+
+        projectId: "final-project-ae3c2",
+
+        storageBucket: "final-project-ae3c2.appspot.com",
+
+        messagingSenderId: "731587089562",
+
+        appId: "1:731587089562:web:b8d6bdec868e87929cfb23",
+
+        measurementId: "G-190SH4242L",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+
+      const auth = firebase.auth();
+
+      //get ref to database services
+      const db = getDatabase();
+      const role = document.getElementById("role").value;
+      const messageDiv = document.getElementById("message");
+
+      document.getElementById("submit").addEventListener("click", async (e) => {
+        e.preventDefault();
+        document.getElementById("message").innerText = "Please wait...";
+        const date = new Date();
+        let day = date.getDate();
+        let month = date.getMonth() + 1;
+        let year = date.getFullYear();
+        let hour = date.getHours();
+        let mins = date.getMinutes();
+        let sec = date.getSeconds();
+        let currentDate = "REF" + year + month + day + hour + mins + sec;
+        var name = document.getElementById("name").value;
+        var email = document.getElementById("email").value;
+        var password = document.getElementById("password").value;
+        var module = document.getElementById("module").value;
+        var office = document.getElementById("office").value;
+        var url = "";
+
+        var stu = "https://img.lovepik.com/element/45009/5297.png_860.png";
+        var lect =
+          "https://p7.hiclipart.com/preview/396/474/550/teacher-education-school-classroom-computer-icons-teacher.jpg";
+        var tutor =
+          "https://static-00.iconduck.com/assets.00/teacher-female-icon-2048x2048-2u02b3ch.png";
+        var cons =
+          "https://suzilula.com/wp-content/uploads/2018/04/Counselling-icon.png";
+
+        try {
+          const userCredential = await auth.createUserWithEmailAndPassword(
+            email,
+            password
+          );
+          const user = userCredential.user;
+          const role = document.getElementById("role").value;
+
+          if (
+            email === "" ||
+            password === "" ||
+            name === "" ||
+            module === "" ||
+            office === ""
+          ) {
+            document.getElementById("message").innerText = "";
+            alert("Provide missing iformation");
+          } else {
+            if (role === "student") {
+              url = stu;
+            } else if (role === "lecturer") {
+              url = lect;
+            } else if (role === "tutor") {
+              url = tutor;
+            } else {
+              url = cons;
+            }
+
+            const db = getDatabase();
+            await set(ref(db, "users/" + user.uid), {
+              username: name,
+              email: email,
+              role: role,
+              userId: user.uid,
+              img: url,
+              module: module,
+              office: office,
+            });
+            window.location.href = "home.html";
+            messageDiv.innerText = "";
+          }
+        } catch (error) {
+          alert("Registration failed. Please try again.");
+          console.error(error);
+          messageDiv.innerText = "";
+        }
+      });
+
+      document.getElementById("loginBtn").addEventListener("click", (e) => {
+        e.preventDefault();
+        var email = document.getElementById("Email").value;
+        var password = document.getElementById("Password").value;
+
+        document.getElementById("message").innerText = "Please wait...";
+
+        if (email === "" || password === "") {
+          alert("Provide missing information");
+        } else {
+          auth
+            .signInWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+              //window.location.href = "home.html";
+              messageDiv.innerText = "";
+            })
+            .catch((error) => {
+              alert("Login error:", error);
+            });
+        }
+        messageDiv.innerText = "";
+      });
+
+      // Active user to homepage
+      firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+          var email = user.email;
+          getUserData(user.uid);
+        }
+      });
+
+      function getUserData(userId) {
+        const dbRef = ref(getDatabase());
+        get(child(dbRef, `users/${userId}`))
+          .then((snapshot) => {
+            if (snapshot.exists()) {
+              if (snapshot.val().role === "student") {
+                window.location.href = "home.html";
+              } else {
+                window.location.href = "dashboard.html";
+              }
+            } else {
+              console.log("No data available");
+            }
+          })
+          .catch((error) => {
+            alert("Login error:", error);
+          });
+      }
+    </script>
+
+    <script>
+      var x = document.getElementById("login");
+      var y = document.getElementById("register");
+      var z = document.getElementById("btn");
+
+      function register() {
+        x.style.left = "-400px";
+        y.style.left = "50px";
+        z.style.left = "110px";
+      }
+
+      function login() {
+        x.style.left = "50px";
+        y.style.left = "450px";
+        z.style.left = "0px";
+      }
+    </script>
+  </body>
+</html>

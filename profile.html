@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile</title>
+
+    <!-- font awesome cdn link  -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css"
+    />
+
+    <!-- custom css file link  -->
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="bar.css" />
+
+    <script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-app.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-auth.js"></script>
+  </head>
+  <body>
+    <header class="header">
+      <section class="flex">
+        <a href="home.html" class="logo">Unizulu Online Booking Consultation</a>
+
+        <form action="search.html" method="post" class="search-form">
+          <input
+            type="text"
+            name="search_box"
+            required
+            placeholder="Search consultation..."
+            maxlength="100"
+          />
+          <button type="submit" class="fas fa-search"></button>
+        </form>
+
+        <div class="icons">
+          <div id="menu-btn" class="fas fa-bars"></div>
+          <div id="search-btn" class="fas fa-search"></div>
+          <div id="user-btn" class="fas fa-user"></div>
+          <div id="toggle-btn" class="fas fa-sun"></div>
+        </div>
+
+        <div class="profile">
+          <img class="image" id="dsImg" onload="getUserData()" />
+          <h3 class="name" id="dsName" onload="getUserData()"></h3>
+          <p class="role" id="dsRole" onload="getUserData()"></p>
+          <a href="profile.html" class="btn">view profile</a>
+          <div class="flex-btn">
+            <button class="option-btn" id="logoutBtn" onclick="signOut()">
+              Logout
+            </button>
+          </div>
+        </div>
+      </section>
+    </header>
+
+    <div class="side-bar">
+      <div id="close-btn">
+        <i class="fas fa-times"></i>
+      </div>
+
+      <div class="profile">
+        <img id="dPhoto" class="image" alt="" />
+        <h3 class="name" id="dName"></h3>
+        <p class="role" id="dRole"></p>
+        <a href="profile.html" class="btn">view profile</a>
+      </div>
+
+      <nav class="navbar">
+        <a href="home.html"><i class="fas fa-home"></i><span>Home</span></a>
+        <a href="bookings.html"
+          ><i class="fas fa-graduation-cap"></i><span>Bookings</span></a
+        >
+        <a href="consultents.html"
+          ><i class="fas fa-chalkboard-user"></i><span>Consultants</span></a
+        >
+      </nav>
+    </div>
+
+    <section class="user-profile">
+      <div
+        class="loader"
+        id="bar"
+        style="position: absolute; float: inherit; left: 55%; top: 50%"
+      ></div>
+
+      <h1 class="heading">Profile</h1>
+
+      <div class="info">
+        <div class="user">
+          <img id="userImg" alt="" />
+          <h3 id="userName"></h3>
+          <p id="userEmail"></p>
+          <p id="userRole"></p>
+          <p id="userOffice"></p>
+        </div>
+      </div>
+    </section>
+
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
+      import {
+        getDatabase,
+        ref,
+        set,
+        get,
+        child,
+      } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
+
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyCzcyCxSy5p26W99GKg2HyGVDkhD4ZElwc",
+
+        authDomain: "final-project-ae3c2.firebaseapp.com",
+
+        databaseURL: "https://final-project-ae3c2-default-rtdb.firebaseio.com",
+
+        projectId: "final-project-ae3c2",
+
+        storageBucket: "final-project-ae3c2.appspot.com",
+
+        messagingSenderId: "731587089562",
+
+        appId: "1:731587089562:web:b8d6bdec868e87929cfb23",
+
+        measurementId: "G-190SH4242L",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+
+      const auth = firebase.auth();
+
+      //get ref to database services
+      const db = getDatabase();
+
+      // SignOut
+      function signOut() {
+        auth.signOut();
+        window.location.href = "signin.html";
+      }
+
+      // Active user to homepage
+      firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+          var userId = user.uid;
+          getUserData(userId);
+        }
+      });
+
+      function getUserData(userId) {
+        document.getElementById("bar").style.display = "none";
+        const dbRef = ref(getDatabase());
+        get(child(dbRef, `users/${userId}`))
+          .then((snapshot) => {
+            if (snapshot.exists()) {
+              document.getElementById("dPhoto").src = snapshot.val().img;
+              document.getElementById("dName").innerHTML =
+                snapshot.val().username;
+              document.getElementById("dRole").innerHTML = snapshot.val().role;
+
+              document.getElementById("dsImg").src = snapshot.val().img;
+              document.getElementById("dsName").innerHTML =
+                snapshot.val().username;
+              document.getElementById("dsRole").innerHTML = snapshot.val().role;
+
+              document.getElementById("userImg").src = snapshot.val().img;
+              document.getElementById("userName").innerHTML =
+                snapshot.val().username;
+              document.getElementById("userRole").innerHTML =
+                snapshot.val().role;
+              document.getElementById("userEmail").innerHTML =
+                snapshot.val().email;
+              document.getElementById("userOffice").innerHTML =
+                snapshot.val().office;
+              document.getElementById("bar").style.display = "none";
+            } else {
+              console.log("No data available");
+
+              document.getElementById("bar").style.display = "none";
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+
+            document.getElementById("bar").style.display = "none";
+          });
+      }
+    </script>
+
+    <!-- custom js file link  -->
+    <script src="js/script.js"></script>
+    <script src="form.js"></script>
+  </body>
+</html>

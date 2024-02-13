@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Consultants</title>
+
+    <!-- font awesome cdn link  -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css"
+    />
+
+    <!-- custom css file link  -->
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="bar.css" />
+
+    <script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-app.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-auth.js"></script>
+
+    <style type="text/css">
+      .slot {
+        width: auto;
+        height: auto;
+        padding: 10px;
+        margin: 5px;
+        background: rgb(2, 43, 2);
+        border-radius: 5px;
+        text-align: center;
+        display: inline-flex;
+        align-content: center;
+        align-items: center;
+        cursor: pointer;
+      }
+
+      .slot::after {
+        color: purple;
+      }
+
+      .pslot {
+        text-align: center;
+        font-size: 14pt;
+        color: rgb(210, 6, 6);
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <section class="flex">
+        <a href="home.html" class="logo"
+          >Unizulu Online Booking Consultation
+        </a>
+
+        <form action="search.html" method="post" class="search-form">
+          <input
+            type="text"
+            name="search_box"
+            required
+            placeholder="Search consultation..."
+            maxlength="100"
+          />
+          <button type="submit" class="fas fa-search"></button>
+        </form>
+
+        <div class="icons">
+          <div id="menu-btn" class="fas fa-bars"></div>
+          <div id="search-btn" class="fas fa-search"></div>
+          <div id="user-btn" class="fas fa-user"></div>
+          <div id="toggle-btn" class="fas fa-sun"></div>
+        </div>
+
+        <div class="profile">
+          <img class="image" id="disImg" />
+          <h3 class="name" id="disName"></h3>
+          <p class="role" id="disRole"></p>
+          <a href="profile.html" class="btn">view profile</a>
+          <div class="flex-btn">
+            <button class="option-btn" id="logoutBtn" onclick="signOut()">
+              Logout
+            </button>
+          </div>
+        </div>
+      </section>
+    </header>
+
+    <div class="side-bar">
+      <div id="close-btn">
+        <i class="fas fa-times"></i>
+      </div>
+
+      <div class="profile">
+        <img id="diPhoto" class="image" alt="" />
+        <h3 class="name" id="diName"></h3>
+        <p class="role" id="diRole"></p>
+        <a href="profile.html" class="btn">view profile</a>
+      </div>
+
+      <nav class="navbar">
+        <a href="home.html"><i class="fas fa-home"></i><span>Home</span></a>
+        <a href="bookings.html"
+          ><i class="fas fa-calendar-day"></i><span>Schedule</span></a
+        >
+        <a href="consultents.html"
+          ><i class="fas fa-chalkboard-teacher"></i><span>Consultants</span></a
+        >
+      </nav>
+    </div>
+
+    <section class="teachers">
+      <div
+        class="loader"
+        id="bar"
+        style="position: absolute; float: inherit; left: 55%; top: 50%"
+      ></div>
+
+      <h1 class="heading">Expert Consultants</h1>
+
+      <form action="" method="post" class="search-tutor">
+        <input
+          type="text"
+          name="search_box"
+          placeholder="search consultants..."
+          required
+          maxlength="100"
+        />
+        <button
+          type="submit"
+          class="fas fa-search"
+          name="search_tutor"
+        ></button>
+      </form>
+
+      <div class="box-container" id="userList"></div>
+    </section>
+
+    <section
+      class="reviews"
+      id="reviews"
+      style="
+        height: 100%;
+        width: 100%;
+        background-color: #755eb5;
+        position: absolute;
+        bottom: 100px;
+        top: 30px;
+        display: none;
+        margin-top: 50px;
+      "
+    >
+      <h1 class="heading">student reviews</h1>
+      <h2 id="consName" style="color: white"></h2>
+      <h2 id="consRatings" style="margin-bottom: 10px; color: white"></h2>
+      <div id="reviewList" class="box-container"></div>
+      <button
+        id="closeBtn"
+        class="btn"
+        style="background-color: white; margin-top: 20px; color: #755eb5"
+      >
+        Close
+      </button>
+    </section>
+
+    <section
+      class="form-container"
+      id="sendReview"
+      style="
+        height: 100%;
+        width: 100%;
+        background-color: #755eb5;
+        position: absolute;
+        bottom: 100px;
+        top: 30px;
+        display: none;
+      "
+    >
+      <form
+        action=""
+        method="post"
+        enctype="multipart/form-data"
+        style="margin-top: 60px"
+      >
+        <h3 id="cons"></h3>
+        <h4>Review</h4>
+        <input
+          type="text"
+          id="review"
+          placeholder="Review"
+          maxlength="200"
+          class="box"
+          required
+        />
+        <h4>Ratings</h4>
+        <select name="stars" id="stars" class="box">
+          <option value="1">1/5</option>
+          <option value="2">2/5</option>
+          <option value="3">3/5</option>
+          <option value="4">4/5</option>
+          <option value="5">5/5</option>
+        </select>
+        <br />
+        <div>
+          <button type="submit" value="Submit" id="btnSubmit" class="btn">
+            Submit
+          </button>
+          <button id="closeButton" class="btn">Close</button>
+        </div>
+      </form>
+    </section>
+
+    <section
+      class="form-container"
+      id="picker"
+      style="position: sticky; bottom: 100px; top: 30px; display: none"
+    >
+      <form action="" method="post" enctype="multipart/form-data">
+        <h1 style="font-size: 16pt">Consultation Times:</h1>
+        <div id="slotList"></div>
+        <select name="topic" id="topic" class="box">
+          <option value="Test">Test</option>
+          <option value="Exam">Exam</option>
+          <option value="Assignment">Assignment</option>
+          <option value="Practical">Practical</option>
+          <option value="Module Content">Module Content</option>
+        </select>
+
+        <input
+          type="text"
+          id="module"
+          placeholder="Module"
+          maxlength="50"
+          class="box"
+          required
+        />
+        <input
+          type="date"
+          id="date"
+          name="date"
+          placeholder="Date"
+          class="box"
+          required
+        />
+        <div style="display: inline-flex">
+          <p
+            style="
+              align-items: center;
+              align-content: center;
+              margin-left: 20px;
+              margin-right: 20px;
+              margin-top: 15px;
+            "
+          >
+            From
+          </p>
+          <p
+            type="time"
+            id="time"
+            name="time"
+            placeholder="Time"
+            class="box"
+            required
+          ></p>
+          <p
+            style="
+              align-items: center;
+              align-content: center;
+              margin-left: 20px;
+              margin-right: 20px;
+              margin-top: 15px;
+            "
+          >
+            to
+          </p>
+          <p
+            type="time"
+            id="timeTo"
+            name="time"
+            placeholder="Time"
+            class="box"
+            required
+          ></p>
+        </div>
+        <br />
+        <div>
+          <input
+            type="submit"
+            value="Submit"
+            name="submit"
+            id="btnSend"
+            class="btn"
+          />
+          <button id="btnClose" class="btn">Close</button>
+        </div>
+      </form>
+    </section>
+
+    <link rel="stylesheet" href="bar.css" />
+
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
+      import {
+        getDatabase,
+        ref,
+        set,
+        get,
+        child,
+      } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
+
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyCzcyCxSy5p26W99GKg2HyGVDkhD4ZElwc",
+
+        authDomain: "final-project-ae3c2.firebaseapp.com",
+
+        databaseURL: "https://final-project-ae3c2-default-rtdb.firebaseio.com",
+
+        projectId: "final-project-ae3c2",
+
+        storageBucket: "final-project-ae3c2.appspot.com",
+
+        messagingSenderId: "731587089562",
+
+        appId: "1:731587089562:web:b8d6bdec868e87929cfb23",
+
+        measurementId: "G-190SH4242L",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+
+      const auth = firebase.auth();
+
+      //get ref to database services
+
+      // SignOut
+      function signOut() {
+        auth.signOut();
+        window.location.href = "signin.html";
+      }
+
+      // Active user to homepage
+      firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+          var userId = user.uid;
+          getUserData(userId);
+          getBookings();
+        }
+      });
+
+      function getUserData(userId) {
+        const dbRef = ref(getDatabase());
+        get(child(dbRef, `users/${userId}`))
+          .then((snapshot) => {
+            if (snapshot.exists()) {
+              document.getElementById("diPhoto").src = snapshot.val().img;
+              document.getElementById("diName").innerHTML =
+                snapshot.val().username;
+              document.getElementById("diRole").innerHTML = snapshot.val().role;
+
+              document.getElementById("disImg").src = snapshot.val().img;
+              document.getElementById("disName").innerHTML =
+                snapshot.val().username;
+              document.getElementById("disRole").innerHTML =
+                snapshot.val().role;
+            } else {
+              console.log("No data available");
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+
+      const btnSend = document.querySelector("#btnSend");
+
+      const btnClose = document.querySelector("#btnClose");
+
+      const date = new Date();
+      let day = date.getDate();
+      let month = date.getMonth() + 1;
+      let year = date.getFullYear();
+      let hour = date.getHours();
+      let mins = date.getMinutes();
+      let sec = date.getSeconds();
+      let currentDate = "REF" + year + month + day + hour + mins + sec;
+
+      function getBookings() {
+        document.getElementById("bar").style.display = "none";
+        const dbRefE = ref(getDatabase());
+        get(child(dbRefE, `users`))
+          .then((snapshot) => {
+            var bookingList = document.getElementById("userList");
+            bookingList.innerHTML = ""; //Clear previous content
+
+            var bookings = [];
+            snapshot.forEach(function (childSnapshot) {
+              var card = document.createElement("div");
+              card.className = "box";
+
+              // Create card content
+              var tutorCard = document.createElement("div");
+              tutorCard.className = "tutor";
+
+              var infoCard = document.createElement("div");
+
+              var bookingImg = document.createElement("img");
+              bookingImg.src = childSnapshot.val().img;
+              bookingImg.className = "image";
+
+              var bookingName = document.createElement("h3");
+              bookingName.textContent = childSnapshot.val().username;
+
+              var bookingRole = document.createElement("h1");
+              bookingRole.textContent = "Role: " + childSnapshot.val().role;
+
+              var bookingModule = document.createElement("p");
+              bookingModule.textContent =
+                "Module: " + childSnapshot.val().module;
+
+              var bookingEmail = document.createElement("p");
+              bookingEmail.textContent = "Email: " + childSnapshot.val().email;
+
+              var bookingOffice = document.createElement("p");
+              bookingOffice.textContent =
+                "Office: " + childSnapshot.val().office;
+
+              var bookingButton = document.createElement("button");
+              bookingButton.textContent = "Book Consultant";
+              bookingButton.className = "btn";
+
+              var reviewButton = document.createElement("button");
+              reviewButton.textContent = "Reviews";
+              reviewButton.className = "btn";
+
+              var sendButton = document.createElement("button");
+              sendButton.textContent = "Send Review";
+              sendButton.className = "btn";
+
+              infoCard.appendChild(bookingName);
+              infoCard.appendChild(bookingRole);
+
+              tutorCard.appendChild(bookingImg);
+              tutorCard.appendChild(infoCard);
+
+              card.appendChild(tutorCard);
+              card.appendChild(bookingEmail);
+              card.appendChild(bookingModule);
+              card.appendChild(bookingOffice);
+              card.appendChild(bookingButton);
+              card.appendChild(reviewButton);
+              card.appendChild(sendButton);
+
+              var closeBtn = document.getElementById("closeBtn");
+
+              var closeButton = document.getElementById("closeButton");
+
+              var submit = document.getElementById("btnSubmit");
+
+              reviewButton.addEventListener("click", () => {
+                document.getElementById("reviews").style.display = "block";
+
+                var nameCons = document.getElementById("consName");
+                nameCons.textContent =
+                  "Consultant: " + childSnapshot.val().username;
+
+                returnReviews(childSnapshot.val().userId);
+              });
+
+              sendButton.addEventListener("click", () => {
+                var cons = document.getElementById("cons");
+                cons.textContent = childSnapshot.val().username;
+
+                document.getElementById("sendReview").style.display = "block";
+
+                submit.addEventListener("click", () => {
+                  document.getElementById("bar").style.display = "block";
+                  var rev = document.getElementById("review").value;
+                  var optionVal = document.getElementById("stars").value;
+                  var sname = document.getElementById("disName").innerHTML;
+                  var simg = document.getElementById("disImg").src;
+
+                  const studentId = firebase.auth().currentUser.uid;
+                  sendReview(
+                    childSnapshot.val().userId,
+                    rev,
+                    sname,
+                    optionVal,
+                    simg,
+                    studentId
+                  );
+                  document.getElementById("bar").style.display = "none";
+                });
+              });
+
+              closeButton.addEventListener("click", () => {
+                document.getElementById("sendReview").style.display = "none";
+              });
+
+              closeBtn.addEventListener("click", () => {
+                document.getElementById("reviews").style.display = "none";
+              });
+
+              // Attach a click event to each product
+              bookingButton.addEventListener("click", () => {
+                // Handle click event (e.g., display more details)
+
+                returnSlot(childSnapshot.val().userId);
+
+                document.getElementById("picker").style.display = "block";
+
+                btnSend.addEventListener("click", function () {
+                  var dateT = document.getElementById("date").value;
+                  var timeFrom = document.getElementById("time").innerHTML;
+                  var timeTo = document.getElementById("timeTo").innerHTML;
+                  var moduleT = document.getElementById("module").value;
+                  var topicT = document.getElementById("topic").value;
+                  var sname = document.getElementById("diName").innerHTML;
+                  var simg = document.getElementById("disImg").src;
+
+                  if (
+                    dateT == "" ||
+                    timeFrom == "" ||
+                    moduleT == "" ||
+                    topicT == ""
+                  ) {
+                    alert("Please provide the missing information!");
+                  } else {
+                    const myArray = dateT.split("-");
+
+                    dateT = myArray[2] + "-" + myArray[1] + "-" + myArray[0];
+
+                    if (
+                      year < parseInt(myArray[0]) ||
+                      (year == parseInt(myArray[0]) &&
+                        month < parseInt(myArray[1])) ||
+                      (month == parseInt(myArray[1]) &&
+                        day < parseInt(myArray[2])) ||
+                      day == parseInt(myArray[2])
+                    ) {
+                      const studentId = firebase.auth().currentUser.uid;
+                      writeUserData(
+                        childSnapshot.val().username,
+                        childSnapshot.val().userId,
+                        childSnapshot.val().img,
+                        dateT,
+                        moduleT,
+                        studentId,
+                        timeFrom,
+                        timeTo,
+                        topicT,
+                        sname,
+                        simg
+                      );
+                    } else {
+                      alert("Please choose a future date for the appointment!");
+                    }
+                  }
+                });
+
+                btnClose.addEventListener("click", function () {
+                  document.getElementById("picker").style.display = "none";
+                });
+              });
+
+              // Add the card to the list
+              if (childSnapshot.val().role !== "student") {
+                bookingList.appendChild(card);
+                document.getElementById("bar").style.display = "none";
+              }
+            });
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+
+      function returnReviews(consId) {
+        const dbRefE = ref(getDatabase());
+        get(child(dbRefE, `reviews`))
+          .then((snapshot) => {
+            var reviewList = document.getElementById("reviewList");
+            reviewList.innerHTML = ""; //Clear previous content
+
+            var rates = 0;
+            var users = 0;
+            var rated = 0;
+            var total = 0;
+
+            snapshot.forEach(function (childSnapshot) {
+              if (consId === childSnapshot.val().consultent) {
+                var box = document.createElement("div");
+                box.className = "box";
+
+                var par = document.createElement("p");
+                par.textContent = childSnapshot.val().review;
+
+                var student = document.createElement("div");
+                student.className = "student";
+
+                var studentImg = document.createElement("img");
+                studentImg.src = childSnapshot.val().surl;
+
+                var studentDiv = document.createElement("div");
+
+                var studentName = document.createElement("h3");
+                studentName.textContent = childSnapshot.val().sname;
+
+                var starDiv = document.createElement("div");
+                starDiv.className = "stars";
+
+                var star1 = document.createElement("i");
+                star1.className = "fas fa-star";
+
+                var star2 = document.createElement("i");
+                star2.className = "fas fa-star";
+
+                var star3 = document.createElement("i");
+                star3.className = "fas fa-star";
+
+                var star4 = document.createElement("i");
+                star4.className = "fas fa-star";
+
+                var star5 = document.createElement("i");
+                star5.className = "fas fa-star";
+
+                let b = parseInt(childSnapshot.val().stars);
+
+                rates = rates + b;
+                users = users + 5;
+                rated = rates / users;
+                total = rated * 5;
+
+                var ratingsCons = document.getElementById("consRatings");
+                ratingsCons.textContent = "Ratings: " + total;
+
+                if (childSnapshot.val().stars === "1") {
+                  starDiv.appendChild(star1);
+                } else if (childSnapshot.val().stars === "2") {
+                  starDiv.appendChild(star1);
+                  starDiv.appendChild(star2);
+                } else if (childSnapshot.val().stars === "3") {
+                  starDiv.appendChild(star1);
+                  starDiv.appendChild(star2);
+                  starDiv.appendChild(star3);
+                } else if (childSnapshot.val().stars === "4") {
+                  starDiv.appendChild(star1);
+                  starDiv.appendChild(star2);
+                  starDiv.appendChild(star3);
+                  starDiv.appendChild(star4);
+                } else {
+                  starDiv.appendChild(star1);
+                  starDiv.appendChild(star2);
+                  starDiv.appendChild(star3);
+                  starDiv.appendChild(star4);
+                  starDiv.appendChild(star5);
+                }
+
+                studentDiv.appendChild(studentName);
+                studentDiv.appendChild(starDiv);
+                student.appendChild(studentImg);
+                student.appendChild(studentDiv);
+                box.appendChild(par);
+                box.appendChild(student);
+                reviewList.appendChild(box);
+              }
+            });
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+
+      function returnSlot(consId) {
+        const dbRefE = ref(getDatabase());
+        get(child(dbRefE, `slots/${consId}`))
+          .then((snapshot) => {
+            var slotList = document.getElementById("slotList");
+            slotList.innerHTML = ""; //Clear previous content
+
+            snapshot.forEach(function (childSnapshot) {
+              var card = document.createElement("div");
+              card.className = "slot";
+
+              var par = document.createElement("p");
+              par.className = "pslot";
+              par.textContent = childSnapshot.val().slot;
+
+              card.appendChild(par);
+              slotList.appendChild(card);
+
+              var moduleT = document.getElementById("module");
+
+              card.addEventListener("click", () => {
+                var newTime = childSnapshot.val().slot;
+                const myArray = newTime.split("-");
+                var timeFrom = document.getElementById("time");
+                var timeTo = document.getElementById("timeTo");
+                timeFrom.innerHTML = myArray[0];
+                timeTo.innerHTML = myArray[1];
+              });
+            });
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+
+      function sendReview(consultent, review, stuName, stars, surl, studentId) {
+        const db = getDatabase();
+        set(ref(db, "reviews/" + currentDate), {
+          consultent: consultent,
+          review: review,
+          sname: stuName,
+          stars: stars,
+          surl: surl,
+          studentId: studentId,
+        });
+      }
+
+      function writeUserData(
+        cname,
+        consultent,
+        curl,
+        date,
+        module,
+        studentId,
+        from,
+        to,
+        title,
+        sname,
+        surl
+      ) {
+        const db = getDatabase();
+        set(ref(db, "appointments/" + currentDate), {
+          cname: cname,
+          bookingId: currentDate,
+          consultent: consultent,
+          curl: curl,
+          date: date,
+          module: module,
+          status: "Pending",
+          studentId: studentId,
+          from: from,
+          to: to,
+          title: title,
+          sname: sname,
+          surl: surl,
+        });
+      }
+    </script>
+
+    <!-- custom js file link  -->
+    <script src="js/script.js"></script>
+    <script src="form.js"></script>
+  </body>
+</html>

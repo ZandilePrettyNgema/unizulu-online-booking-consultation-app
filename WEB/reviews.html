@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reviews</title>
+
+    <!-- font awesome cdn link  -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css"
+    />
+
+    <!-- custom css file link  -->
+    <link rel="stylesheet" href="css/style.css" />
+
+    <!-- CSS -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="./evo-calendar/css/evo-calendar.min.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="./evo-calendar/css/evo-calendar.orange-coral.min.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="./evo-calendar/css/evo-calendar.midnight-blue.min.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="./evo-calendar/css/evo-calendar.royal-navy.min.css"
+    />
+
+    <link rel="stylesheet" type="text/css" href="./demo/demo.css" />
+    <!-- Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Mono&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://font-awesome/less/variables.less/to/font-awesome/css/font-awesome.min.css"
+    />
+
+    <meta
+      name="description"
+      content="Stay organized with our user-friendly Calendar featuring events, reminders, and a customizable interface. Built with HTML, CSS, and JavaScript. Start scheduling today!"
+    />
+    <meta
+      name="keywords"
+      content="calendar, events, reminders, javascript, html, css, open source coding"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+      integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="cal.css" />
+
+    <script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-app.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-auth.js"></script>
+
+    <script src="form.js"></script>
+    <link rel="stylesheet" href="bar.css" />
+  </head>
+  <body>
+    <header class="header">
+      <section class="flex">
+        <a href="home.html" class="logo">Unizulu Online Booking Consultation</a>
+
+        <form action="search.html" method="post" class="search-form">
+          <input
+            type="text"
+            name="search_box"
+            required
+            placeholder="Search consultation..."
+            maxlength="100"
+          />
+          <button type="submit" class="fas fa-search"></button>
+        </form>
+
+        <div class="icons">
+          <div id="menu-btn" class="fas fa-bars"></div>
+          <div id="search-btn" class="fas fa-search"></div>
+          <div id="user-btn" class="fas fa-user"></div>
+          <div id="toggle-btn" class="fas fa-sun"></div>
+        </div>
+
+        <div class="profile">
+          <img class="image" id="dsImg" onload="getUserData()" />
+          <h3 class="name" id="dsName" onload="getUserData()"></h3>
+          <p class="role" id="dsRole" onload="getUserData()"></p>
+          <a href="profile.html" class="btn">view profile</a>
+          <div class="flex-btn">
+            <button class="option-btn" id="logoutBtn" onclick="signOut()">
+              Logout
+            </button>
+          </div>
+        </div>
+      </section>
+    </header>
+
+    <div class="side-bar">
+      <div id="close-btn">
+        <i class="fas fa-times"></i>
+      </div>
+
+      <div class="profile">
+        <img id="dPhoto" class="image" alt="" />
+        <h3 class="name" id="dName"></h3>
+        <p class="role" id="dRole"></p>
+        <a href="profile.html" class="btn">view profile</a>
+      </div>
+
+      <nav class="navbar">
+        <a href="dashboard.html"
+          ><i class="fas fa-home"></i><span>Home</span></a
+        >
+        <a href="requests.html"
+          ><i class="fas fa-calendar-day"></i><span>Bookings</span></a
+        >
+        <a href="reviews.html"
+          ><i class="fas fa-star"></i><span>Reviews</span></a
+        >
+        <a href="contact.html"
+          ><i class="fas fa-gear"></i><span>Manage Bookings</span></a
+        >
+      </nav>
+    </div>
+
+    <section class="reviews">
+      <h1 class="heading">student reviews</h1>
+      <div id="reviewList" class="box-container"></div>
+    </section>
+
+    <!--<footer class="footer">
+
+   &copy; copyright @ 2022 by <span>mr. web designer</span> | all rights reserved!
+
+</footer>-->
+
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
+      import {
+        getDatabase,
+        ref,
+        set,
+        get,
+        child,
+      } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
+
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyCzcyCxSy5p26W99GKg2HyGVDkhD4ZElwc",
+
+        authDomain: "final-project-ae3c2.firebaseapp.com",
+
+        databaseURL: "https://final-project-ae3c2-default-rtdb.firebaseio.com",
+
+        projectId: "final-project-ae3c2",
+
+        storageBucket: "final-project-ae3c2.appspot.com",
+
+        messagingSenderId: "731587089562",
+
+        appId: "1:731587089562:web:b8d6bdec868e87929cfb23",
+
+        measurementId: "G-190SH4242L",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+
+      const auth = firebase.auth();
+
+      //get ref to database services
+      const db = getDatabase();
+
+      // SignOut
+      function signOut() {
+        auth.signOut();
+        window.location.href = "signin.html";
+      }
+
+      // Active user to homepage
+      firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+          var userId = user.uid;
+          var UserId = user.uid;
+          getUserData(userId);
+          returnReviews(userId);
+        }
+      });
+
+      function getUserData(userId) {
+        const dbRef = ref(getDatabase());
+        get(child(dbRef, `users/${userId}`))
+          .then((snapshot) => {
+            if (snapshot.exists()) {
+              document.getElementById("dPhoto").src = snapshot.val().img;
+              document.getElementById("dName").innerHTML =
+                snapshot.val().username;
+              document.getElementById("dRole").innerHTML = snapshot.val().role;
+
+              document.getElementById("dsImg").src = snapshot.val().img;
+              document.getElementById("dsName").innerHTML =
+                snapshot.val().username;
+              document.getElementById("dsRole").innerHTML = snapshot.val().role;
+            } else {
+              console.log("No data available");
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+
+      function returnReviews(consId) {
+        const dbRefE = ref(getDatabase());
+        get(child(dbRefE, `reviews`))
+          .then((snapshot) => {
+            var reviewList = document.getElementById("reviewList");
+            reviewList.innerHTML = ""; //Clear previous content
+
+            snapshot.forEach(function (childSnapshot) {
+              if (consId === childSnapshot.val().consultent) {
+                var box = document.createElement("div");
+                box.className = "box";
+
+                var par = document.createElement("p");
+                par.textContent = childSnapshot.val().review;
+
+                var student = document.createElement("div");
+                student.className = "student";
+
+                var studentImg = document.createElement("img");
+                studentImg.src = childSnapshot.val().surl;
+
+                var studentDiv = document.createElement("div");
+
+                var studentName = document.createElement("h3");
+                studentName.textContent = childSnapshot.val().sname;
+
+                var starDiv = document.createElement("div");
+                starDiv.className = "stars";
+
+                var star1 = document.createElement("i");
+                star1.className = "fas fa-star";
+
+                var star2 = document.createElement("i");
+                star2.className = "fas fa-star";
+
+                var star3 = document.createElement("i");
+                star3.className = "fas fa-star";
+
+                var star4 = document.createElement("i");
+                star4.className = "fas fa-star";
+
+                var star5 = document.createElement("i");
+                star5.className = "fas fa-star";
+
+                if (childSnapshot.val().stars === "1") {
+                  starDiv.appendChild(star1);
+                } else if (childSnapshot.val().stars === "2") {
+                  starDiv.appendChild(star1);
+                  starDiv.appendChild(star2);
+                } else if (childSnapshot.val().stars === "3") {
+                  starDiv.appendChild(star1);
+                  starDiv.appendChild(star2);
+                  starDiv.appendChild(star3);
+                } else if (childSnapshot.val().stars === "4") {
+                  starDiv.appendChild(star1);
+                  starDiv.appendChild(star2);
+                  starDiv.appendChild(star3);
+                  starDiv.appendChild(star4);
+                } else {
+                  starDiv.appendChild(star1);
+                  starDiv.appendChild(star2);
+                  starDiv.appendChild(star3);
+                  starDiv.appendChild(star4);
+                  starDiv.appendChild(star5);
+                }
+
+                studentDiv.appendChild(studentName);
+                studentDiv.appendChild(starDiv);
+                student.appendChild(studentImg);
+                student.appendChild(studentDiv);
+                box.appendChild(par);
+                box.appendChild(student);
+                reviewList.appendChild(box);
+              }
+            });
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+    </script>
+    <!-- custom js file link  -->
+    <script src="js/script.js"></script>
+  </body>
+</html>

@@ -95,6 +95,16 @@
   outline: none;
   border-radius: 30px;
 }
+.btn {
+  border-radius: 0.5rem;
+  color:black;
+  font-size: 1.8rem;
+  cursor: pointer;
+  text-transform: capitalize;
+  padding: 1rem 3rem;
+  text-decoration: none;
+  background: linear-gradient(45deg, #6ac1c5, #bda5ff);;
+}
 .check-box {
   margin: 30px 10px 30px 0;
 }
@@ -129,4 +139,14 @@ dialog {
   text-align: center;
   position: relative;
   color: #000000;
+}
+.guest-page {
+  text-align: center;
+  margin: 150px 0;
+}
+.guest-page h1 {
+  margin-bottom: 88px;
+  word-wrap: break-word;
+  color:  #000;
+  font-weight: 900;
 }
